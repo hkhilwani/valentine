@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Valentine?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: #ffe6ec;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      padding: 0 20px;
+    }
+
+    .button-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 50px; /* space between Yes and No initially */
+      width: 100%;
+      max-width: 400px;
+      height: 100px;
+    }
+
+    button {
+      padding: 14px 26px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    #yes {
+      background-color: #ff4d6d;
+      color: white;
+      position: relative; /* stays in container */
+    }
+
+    #no {
+      background-color: #999;
+      color: white;
+      position: fixed; /* moves freely */
+      left: 50%; /* initial position center-ish */
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #message {
+      display: none;
+      font-size: 24px;
+      max-width: 90%;
+      z-index: 5;
+    }
+
+    .heart {
+      position: fixed;
+      font-size: 26px;
+      animation: floatUp 2.5s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-160px) scale(1.8); opacity: 0; }
+    }
+
+    .name-heart {
+      position: fixed;
+      font-size: 34px;
+      animation: popIn 0.8s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="question">Dylann, will you be my Valentine? 💖</h1>
+
+  <div class="button-container">
+    <button id="yes">Yes</button>
+    <button id="no">No</button>
+  </div>
+
+  <div id="message">
+    💕 You just made me the happiest person ever 💕  
+    <br><br>
+    I can’t wait to make so many memories with you 🥰
+  </div>
+
+  <audio id="music" src="champagne.mp3"></audio>
+
+  <script>
+    const noButton = document.getElementById("no");
+    const yesButton = document.getElementById("yes");
+    const message = document.getElementById("message");
+    const question = document.getElementById("question");
+    const music = document.getElementById("music");
+
+    // YES BUTTON
+    yesButton.addEventListener("click", () => {
+      question.style.display = "none";
+      yesButton.style.display = "none";
+      noButton.style.display = "none";
+      message.style.display = "block";
+
+      playMusic();
+      explodeHearts();
+      spellName();
+    });
+
+    function explodeHearts() {
+      for (let i = 0; i < 25; i++) {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.textContent = "💖";
+        heart.style.left = Math.random() * window.innerWidth + "px";
+        heart.style.top = Math.random() * window.innerHeight + "px";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 2500);
+      }
+    }
+
+    function spellName() {
+      const name = "DYLANN";
+      const startX = window.innerWidth / 2 - (name.length * 30);
+      
+      // Mobile-friendly vertical position: above the message
+      let y;
+      if (window.innerWidth < 500) { // mobile screens
+        y = window.innerHeight / 2 - 120; 
+      } else { // desktop
+        y = window.innerHeight / 2 - 40;
+      }
+
+      [...name].forEach((letter, i) => {
+        setTimeout(() => {
+          const heart = document.createElement("div");
+          heart.className = "name-heart";
+          heart.textContent = "💖" + letter;
+          heart.style.left = startX + i * 60 + "px";
+          heart.style.top = y + "px";
+          document.body.appendChild(heart);
+        }, i * 200);
+      });
+    }
+
+    function playMusic() {
+      music.play().catch(err => console.log("Music play prevented:", err));
+    }
+
+    // NO BUTTON — moves away on hover, always inside viewport
+    function moveNoButton() {
+      const buttonWidth = noButton.offsetWidth;
+      const buttonHeight = noButton.offsetHeight;
+
+      const maxX = window.innerWidth - buttonWidth - 10;
+      const maxY = window.innerHeight - buttonHeight - 10;
+
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+
+      noButton.style.left = `${x}px`;
+      noButton.style.top = `${y}px`;
+    }
+
+    noButton.addEventListener("mouseover", moveNoButton);
+    noButton.addEventListener("touchstart", moveNoButton);
+
+    // responsive: prevent No from going offscreen on resize
+    window.addEventListener("resize", () => {
+      const rect = noButton.getBoundingClientRect();
+      if (rect.right > window.innerWidth) noButton.style.left = "10px";
+      if (rect.bottom > window.innerHeight) noButton.style.top = "10px";
+    });
+  </script>
+
+</body>
+</html>
